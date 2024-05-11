@@ -1,0 +1,149 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+ 
+{% block content %}
+{% block main %}
+
+
+<div class="container-fluid">
+<div class="card card-outline  border-secondary p-2">
+  <div class="card-body">
+    <h4 class="text-info">Select Programme, Semister and Year of Study</h3>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="programme">Programme:</label>
+        <select id="programme" name="programme" class="form-control" required>
+          <option value="" disabled selected>Select Programme</option>
+          {% for programme in programmes %}
+            <option>{{ programme }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="semester">Semester:</label>
+        <select id="semester" name="semester" class="form-control" required>
+          <option value="" disabled selected>Select Semester</option>
+          {% for semester in semesters %}
+            <option>{{ semester }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="year_of_study">Year of Study:</label>
+        <select id="year_of_study" name="year_of_study" class="form-control" required>
+          <option value="" disabled selected>Select Year of Study</option>
+          {% for year_of_study in years_of_study %}
+            <option>{{ year_of_study }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn btn-dark  mt-3 ">Search</button>
+    </form>
+
+  </div>
+</div>
+
+<style>
+  #card{
+      overflow-x: auto; /* Enable horizontal scrolling */
+      width: 100%; /* Set the width of the container */
+  }
+  #today_table{
+      overflow-x: auto; /* Enable horizontal scrolling */
+      width: 100%; /* Set the width of the container */
+  }
+</style>
+
+<div class="card card-outline card-info"id="card">
+  <div class="card-header w-100">
+    <div class="card-title">
+      {% if selected_programme %}
+      <h4 class="text-dark"> <span class="badge badge-light text-info p-2">Weekly TimeTable of:   {{ selected_programme }} </span>  </h4>
+      <p class="fas fa-building text-info p-2"> Department of {{ department }}  [ From: {{ monday }} to {{ friday }} Year: {{ current_year }} ]</p>
+      {% endif %}
+      
+     
+    </div>
+    <div class="card-tools">
+      <!-- Collapse Button -->
+      <button id="btn" type="button" class="btn btn-tool w-100" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+    </div>
+  </div>  
+  <div class="card-body">
+
+  
+   
+    <table id="today_table" class="table table-bordered border  table-hover w-100 text-dark">
+      <thead>
+        <tr>
+          <th colspan="10">Days: 
+            {% for day in timetable_data %}
+              {{ day }},
+            {% endfor %}
+          </th>
+        </tr>
+        <tr>
+          <th>Day</th>
+          <th>Session Type</th>
+          <th>Course Name</th>
+          <th>Course Code</th>
+          <th>Instructor</th>
+          <th>Venue</th>
+          <th>Time Start</th>
+          <th>Time End</th>
+          <th colspan="2">Course Description</th> <!-- Span the Course Description column -->
+        </tr>
+      </thead>
+      <tbody>
+        {% for day, entries in timetable_data.items %}
+        {% for entry in entries %}
+        <tr>
+          {% if forloop.first %}
+          <td rowspan="{{ entries|length }}"><span class="badge badge-dark p-2 text-white">{{ day }}</span> <br><strong> Total courses: <span class="badge badge-primary badge-pill p-1">{{ entries|length }}</span></strong></td>
+          {% endif %}
+          <td>{{ entry.SessionType }}</td>
+          <td>{{ entry.CourseName.Course }}</td> <!-- Access CourseName's Course field -->
+          <td>{{ entry.CourseName.CourseCode }}</td> <!-- Access CourseName's CourseCode field -->
+          <td>{{ entry.Instructor }}</td>
+          <td>{{ entry.Venue }}</td>
+          <td><span class="badge badge-light p-2 text-primary">{{ entry.Timestart }}</span></td>
+          <td><span class="badge badge-light p-2 text-danger">{{ entry.TimeEnd }}</span></td>
+          {% if forloop.first %}
+          <td rowspan="{{ entries|length }}">
+             
+              <div class="card-header card-outline card-gray ">
+            {% comment %} Iterate over each entry to display CourseCode and CourseDescription {% endcomment %}
+            <ol>
+              {% for e in entries %}
+                <li>    {{ e.CourseName.CourseCode }} - {{ e.CourseName.CourseDescription }}</li>
+              {% endfor %}
+            </ol>
+          </div>
+         
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
+    
+
+
+    
+
+
+  </div>
+</div> 
+    
+   
+
+  
+   
+  
+
+    
+{% endblock %}
+
+{% endblock %}
